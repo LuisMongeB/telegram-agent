@@ -1,0 +1,6 @@
+python-telegram-bot==21.7
+langgraph==0.2.34
+python-dotenv==1.0.1
+openai==1.55.3
+pydub==0.25.1
+asyncio==3.4.3
