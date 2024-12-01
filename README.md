@@ -20,6 +20,8 @@ A Telegram bot that leverages OpenAI's capabilities to transcribe voice messages
 
 ## Installation
 
+```pip install -r requirements.txt``` on the root directory.
+
 ## Configuration
 
 ## Usage
