@@ -1,6 +1,6 @@
 # Telegram AI Agent
 
-A Telegram bot that leverages OpenAI's capabilities to transcribe voice messages and provide intelligent summaries. The bot listens for voice messages, processes them using OpenAI's speech-to-text API, and returns concise summaries back to the chat.
+A Telegram bot that leverages OpenAI's capabilities to transcribe voice messages and provide intelligent summaries. The bot listens for voice messages, once a voice message is received, it starts the LangGraph agent workflow to process them using OpenAI's speech-to-text API, and returns concise summaries back to the chat.
 
 > **Current Status**: Version 0.1 - Local polling implementation  
 > **Coming Soon**: Webhook implementation with Azure Functions
