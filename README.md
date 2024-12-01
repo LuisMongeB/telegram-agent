@@ -42,7 +42,7 @@ A Telegram bot that leverages OpenAI's capabilities to transcribe voice messages
 │   ├── config.py
 │   ├── downloads
 │   │   ├── temp
-│   │   └── voice_20241201_113253_34.mp3
+│   │   └── example.mp3
 │   ├── main.py
 │   └── telegram_utils
 │       ├── __init__.py
