@@ -1,0 +1,9 @@
+services:
+  functions:
+    build: .
+    environment:
+      - FUNCTIONS_WORKER_RUNTIME=python
+    ports:
+      - "80:80"
+    volumes:
+      - .:/home/site/wwwroot
