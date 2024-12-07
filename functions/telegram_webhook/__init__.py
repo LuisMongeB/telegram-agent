@@ -218,6 +218,24 @@ async def process_voice_message(message_data: dict) -> Optional[str]:
             logging.error(f"Error cleaning up temporary files: {str(e)}")
 
 
+async def handle_start_command(chat_id: int) -> None:
+    """Handle the /start command."""
+    welcome_message = (
+        "👋 Welcome to Nebula! I'm a voice processing assistant (for now) that helps you with audio messages.\n\n"
+        "🎯 Here's what I can do:\n"
+        "• If you audio message is too short, I will just transcribe it."
+        "• Provide summaries of long audio messages (over 100 words)\n"
+        "• Process audio in multiple languages\n"
+        "📱 To use me, simply:\n"
+        "1. Send or forward any voice/audio message (up to 10 minutes)\n"
+        "2. Wait while I process it\n"
+        "3. Get your transcription, summary, and response!\n\n"
+        "Try it now by sending a voice message! 🎤"
+    )
+
+    await send_telegram_response(chat_id, welcome_message)
+
+
 async def main(req: func.HttpRequest) -> func.HttpResponse:
     """Main function handler for the Telegram webhook."""
     logging.info("Python HTTP trigger function processed a request.")
@@ -227,10 +245,23 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
         update_data = req.get_json()
         logging.info(f"Received update data: {update_data}")
 
-        # Check if it's a voice message
-        if not (message := update_data.get("message")) or not (
-            message.get("voice") or message.get("audio")
-        ):
+        # Check if it's a message
+        if not (message := update_data.get("message")):
+            return func.HttpResponse("Not a message", status_code=200)
+
+        # Handle bot commands
+        if "entities" in message and message["entities"][0]["type"] == "bot_command":
+            if message["text"] == "/start":
+                logging.info("Handling /start command")
+                await handle_start_command(message["chat"]["id"])
+                return func.HttpResponse(
+                    json.dumps({"status": "command processed"}),
+                    mimetype="application/json",
+                    status_code=200,
+                )
+
+        # Check if it's a voice message (rest of your existing code...)
+        if not (message.get("voice") or message.get("audio")):
             return func.HttpResponse("Not a voice message", status_code=200)
 
         file_id = (
