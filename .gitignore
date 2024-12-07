@@ -28,4 +28,5 @@ ENV/
 # Local development
 .python_packages
 .azurite
+azurite
 downloads/
