@@ -3,3 +3,29 @@ src/downloads
 .env
 **/.DS_Store**
 **.mp3
+host.json
+local.settings.json
+# Azure Functions artifacts
+bin
+obj
+appsettings.json
+local.settings.json
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+env/
+.env
+.venv
+venv/
+ENV/
+
+# VS Code
+.vscode/
+
+# Local development
+.python_packages
+.azurite
+downloads/
