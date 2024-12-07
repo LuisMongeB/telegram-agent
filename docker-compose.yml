@@ -3,6 +3,8 @@ services:
     build: .
     environment:
       - FUNCTIONS_WORKER_RUNTIME=python
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
     ports:
       - "80:80"
     volumes:
