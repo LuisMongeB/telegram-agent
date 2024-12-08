@@ -10,3 +10,5 @@ azure-storage-blob==12.24.0
 azure-storage-queue==12.12.0
 grpcio==1.59.0
 protobuf==4.21.12
+backoff==2.2.1
+aiohttp==3.10.9
