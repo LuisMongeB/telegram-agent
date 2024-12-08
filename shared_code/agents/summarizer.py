@@ -1,70 +1,73 @@
-# src/agents/summarizer.py
 import logging
-from typing import Dict, List, Optional, Tuple
+from typing import Optional
 
-from openai import OpenAI
+from shared_code.services.openai_service import OpenAIService
 
 
 class Summarizer:
-    """Agent responsible for transcription and summarization of audio content."""
+    """
+    Agent responsible for summarization of transcribed content. This class focuses solely
+    on converting longer transcribed text into concise, meaningful summaries while preserving
+    the key information and context from the original content.
+    """
 
-    def __init__(self, openai_client: OpenAI):
-        self.client = openai_client
-
-    async def transcribe_audio(self, audio_path: str) -> Optional[Tuple[str, str]]:
+    def __init__(self, openai_service: OpenAIService):
         """
-        Transcribe audio file using Whisper.
-        Returns a tuple of (transcription, detected_language) or None if failed.
+        Initialize the summarizer with an OpenAI service instance.
+
+        Parameters:
+            openai_service (OpenAIService): Service handling OpenAI API interactions
         """
-        try:
-            with open(audio_path, "rb") as audio_file:
-                transcript = self.client.audio.transcriptions.create(
-                    model="whisper-1",
-                    file=audio_file,
-                    response_format="verbose_json",
-                    prompt=None,  # Get additional info including language
-                )
-
-            detected_language = transcript.language
-            text = transcript.text
-
-            logging.info(f"Successfully transcribed audio: {audio_path}")
-            logging.info(f"Detected language: {detected_language}")
-
-            return text, detected_language
-
-        except Exception as e:
-            logging.error(f"Error transcribing audio: {str(e)}", exc_info=True)
-            return None
+        self.openai_service = openai_service
 
     async def summarize_transcription(
         self, transcription: str, language: str
     ) -> Optional[str]:
-        """Summarize transcription using GPT."""
+        """
+        Summarizes the provided transcription using GPT, taking into account the language
+        of the original content. The summary maintains the original language and tone while
+        condensing the content into a clear, concise format.
+
+        Parameters:
+            transcription (str): The text to be summarized
+            language (str): The detected language of the transcription, used to ensure
+                          the summary maintains the same language
+
+        Returns:
+            Optional[str]: A concise summary of the transcription, or None if summarization fails
+        """
         try:
-            response = self.client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[
-                    {
-                        "role": "system",
-                        "content": """
-                        You are an expert at summarizing spoken conversations. Your task is to create a clear, concise summary of audio transcripts while:
+            # Construct the message array for the chat completion
+            messages = [
+                {
+                    "role": "system",
+                    "content": (
+                        "You are an expert at summarizing spoken conversations. "
+                        "Your task is to create a clear, concise summary of audio transcripts while:\n\n"
+                        "1. Capturing the essential meaning and key points\n"
+                        "2. Maintaining the original tone and language of the speaker\n"
+                        "3. Preserving important details, numbers, or specific references\n"
+                        "4. Keeping the summary to 2-3 sentences maximum\n"
+                        "5. Using natural, conversational language that reflects spoken communication\n\n"
+                        "Remember this is transcribed speech, so focus on the core message rather than exact wording. "
+                        "If the transcript contains filler words or speech artifacts, distill the actual meaning.\n"
+                        f"The detected language of this audio is: {language}"
+                    ),
+                },
+                {"role": "user", "content": transcription},
+            ]
 
-                        1. Capturing the essential meaning and key points
-                        2. Maintaining the original tone and language of the speaker
-                        3. Preserving important details, numbers, or specific references
-                        4. Keeping the summary to 2-3 sentences maximum
-                        5. Using natural, conversational language that reflects spoken communication
-
-                        Remember this is transcribed speech, so focus on the core message rather than exact wording. If the transcript contains filler words or speech artifacts, distill the actual meaning."""
-                        f"The detected language of this audio is: {language}",
-                    },
-                    {"role": "user", "content": transcription},
-                ],
+            # Generate the summary using the OpenAI service
+            summary = await self.openai_service.generate_chat_completion(
+                messages=messages, model="gpt-4o-mini", temperature=0.2
             )
-            summary = response.choices[0].message.content
-            logging.info(f"Successfully generated summary in {language}")
-            return summary
+
+            if summary:
+                logging.info(f"Successfully generated summary in {language}")
+                return summary
+
+            logging.warning("Failed to generate summary - no content returned")
+            return None
 
         except Exception as e:
             logging.error(f"Error summarizing transcription: {str(e)}", exc_info=True)
