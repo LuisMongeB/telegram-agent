@@ -155,8 +155,7 @@ class AudioProcessor:
                     message_data["chat_id"],
                     status_message_id,
                     f"📝 <b>Transcription</b> (in {language_display}):\n\n"
-                    f"{transcription}\n\n"
-                    f"ℹ️ Message is too short for summary ({word_count} words)",
+                    f"{transcription}\n\n",
                 )
                 return
 

@@ -21,9 +21,6 @@ RUN mkdir -p /home/site/wwwroot
 # First, copy the shared code to maintain proper imports
 COPY shared_code /home/site/wwwroot/shared
 
-# Copy the functions directory with your webhook handler
-COPY functions /home/site/wwwroot/functions
-
 # Copy the Azure Functions configuration files
 COPY host.json /home/site/wwwroot/
 COPY local.settings.json /home/site/wwwroot/
